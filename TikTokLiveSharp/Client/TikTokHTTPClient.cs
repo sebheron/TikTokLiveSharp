@@ -31,9 +31,9 @@ namespace TikTokLiveSharp.Client
 
         private readonly HttpClient client;
         private readonly HttpClientHandler handler;
-        private readonly ProxyContainer proxyContainer;
+        public ProxyContainer proxyContainer { get; }
 
-        public TikTokHTTPClient(TimeSpan? timeout, ProxyContainer proxyContainer = null, Dictionary<string, string> additionalHeaders = null)
+        internal TikTokHTTPClient(TimeSpan? timeout, ProxyContainer proxyContainer = null, Dictionary<string, string> additionalHeaders = null)
         {
             this.handler = new HttpClientHandler();
             this.client = new HttpClient(this.handler);
@@ -66,31 +66,6 @@ namespace TikTokLiveSharp.Client
             return await request.Content.ReadAsStringAsync();
         }
 
-        protected async Task<string> GetLivestreamPage(string userID)
-        {
-            var bytes = await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live");
-            return Encoding.UTF8.GetString(bytes);
-        }
-
-        private async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
-        {
-            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
-            return Serializer.Deserialize<WebcastResponse>(new ReadOnlyMemory<byte>(bytes));
-        }
-
-        protected async Task<JObject> GetJObjectFromWebcastAPI(string path, Dictionary<string, object> parameters)
-        {
-            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
-            var json = Encoding.UTF8.GetString(bytes);
-            return JObject.Parse(json);
-        }
-
-        protected async Task<JObject> PostJObjecttToWebcastAPI(string path, Dictionary<string, object> parameters, JObject json)
-        {
-            var replyJson = await this.PostRequest(TIKTOK_URL_WEBCAST + path, json.ToString(Newtonsoft.Json.Formatting.None), parameters);
-            return JObject.Parse(replyJson);
-        }
-
         private string BuildQueryString(Dictionary<string, object> parameters)
         {
             var queryString = new StringBuilder();
@@ -102,6 +77,31 @@ namespace TikTokLiveSharp.Client
                 queryString.Append("&");
             }
             return queryString.ToString();
+        }
+
+        internal async Task<string> GetLivestreamPage(string userID)
+        {
+            var bytes = await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live");
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        internal async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
+        {
+            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
+            return Serializer.Deserialize<WebcastResponse>(new ReadOnlyMemory<byte>(bytes));
+        }
+
+        internal async Task<JObject> GetJObjectFromWebcastAPI(string path, Dictionary<string, object> parameters)
+        {
+            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
+            var json = Encoding.UTF8.GetString(bytes);
+            return JObject.Parse(json);
+        }
+
+        internal async Task<JObject> PostJObjecttToWebcastAPI(string path, Dictionary<string, object> parameters, JObject json)
+        {
+            var replyJson = await this.PostRequest(TIKTOK_URL_WEBCAST + path, json.ToString(Newtonsoft.Json.Formatting.None), parameters);
+            return JObject.Parse(replyJson);
         }
     }
 }
