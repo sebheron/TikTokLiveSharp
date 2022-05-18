@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Security.Cryptography;
 
 namespace TikTokLiveSharp.Client.Proxy
 {
     internal class ProxyContainer
     {
-        private readonly string[] proxies;
         private int index;
 
         /// <summary>
@@ -51,7 +48,7 @@ namespace TikTokLiveSharp.Client.Proxy
         {
             this.Mode = mode;
             this.Enabled = enabled;
-            this.proxies = proxies;
+            this.proxies = new List<string>(proxies);
             this.index = 0;
         }
 
@@ -97,8 +94,13 @@ namespace TikTokLiveSharp.Client.Proxy
         public RotationSettings Mode { get; private set; }
 
         /// <summary>
+        /// List of proxies.
+        /// </summary>
+        public List<string> proxies { get; }
+
+        /// <summary>
         /// Gets the number of proxies.
         /// </summary>
-        public int Count => proxies.Length;
+        public int Count => proxies.Count;
     }
 }
