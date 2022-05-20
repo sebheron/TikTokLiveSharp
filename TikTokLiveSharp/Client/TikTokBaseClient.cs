@@ -109,6 +109,7 @@ namespace TikTokLiveSharp.Client
                 if (!String.IsNullOrEmpty(id))
                 {
                     this.clientParams["room_id"] = id;
+                    this.roomID = id;
                     return id;
                 }
                 throw new Exception(html.Contains("\"og:url\"") ? "User might be offline" : "Your IP or country might be blocked by TikTok.");
@@ -137,7 +138,7 @@ namespace TikTokLiveSharp.Client
         {
             try
             {
-                var response = await this.http.GetJObjectFromWebcastAPI(roomID, this.clientParams);
+                var response = await this.http.GetJObjectFromWebcastAPI("gift/list/", this.clientParams);
                 var gifts = response.SelectToken("..gifts")?.Children();
                 foreach (var gift in gifts)
                 {
@@ -197,7 +198,7 @@ namespace TikTokLiveSharp.Client
 
                 if (this.fetchRoomInfoOnConnect)
                 {
-                    var status = (await this.fetchRoomInfo()).SelectToken(".status");
+                    var status = (await this.fetchRoomInfo()).SelectToken(".data").SelectToken(".status");
                     if (status == null || status.Value<int>() == 4)
                     {
                         throw new LiveNotFoundException();

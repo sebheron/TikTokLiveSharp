@@ -35,7 +35,7 @@ namespace TikTokLiveSharp.Client
         protected override async Task<string> connect()
         {
             var roomID = await base.connect();
-            if (this.Connected)
+            if (this.Connected && this.OnConnection != null)
             {
                 this.OnConnection.Invoke(this, new ConnectionEventArgs(true));
             }
@@ -45,7 +45,7 @@ namespace TikTokLiveSharp.Client
         protected override async Task disconnect()
         {
             await base.disconnect();
-            if (!this.Connected)
+            if (!this.Connected && this.OnConnection != null)
             {
                 this.OnConnection.Invoke(this, new ConnectionEventArgs(false));
             }
@@ -67,11 +67,13 @@ namespace TikTokLiveSharp.Client
             {
                 case nameof(WebcastChatMessage):
                     var chatMessage = ProtoBuf.Serializer.Deserialize<WebcastChatMessage>(bytes);
-                    this.OnCommentRecieved.Invoke(this, new CommentEventArgs(chatMessage.User.uniqueId, chatMessage.Comment));
+                    if (OnCommentRecieved != null)
+                        this.OnCommentRecieved.Invoke(this, new CommentEventArgs(chatMessage.User.uniqueId, chatMessage.Comment));
                     break;
                 case nameof(WebcastGiftMessage):
                     var giftMessage = ProtoBuf.Serializer.Deserialize<WebcastGiftMessage>(bytes);
-                    this.OnGiftRecieved.Invoke(this, new GiftEventArgs(giftMessage.User.uniqueId, giftMessage));
+                    if (OnGiftRecieved != null)
+                        this.OnGiftRecieved.Invoke(this, new GiftEventArgs(giftMessage.User.uniqueId, giftMessage));
                     break;
             }
         }

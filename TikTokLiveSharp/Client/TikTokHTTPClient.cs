@@ -25,11 +25,10 @@ namespace TikTokLiveSharp.Client
             { "Cache-Control", "max-age=0" },
             { "Accept", "text/html,application/json,application/protobuf" },
             { "User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36" },
-            { "Referer", "https,//www.tiktok.com/" },
-            { "Origin", "https,//www.tiktok.com" },
+            { "Referer", "https://www.tiktok.com/" },
+            { "Origin", "https://www.tiktok.com" },
             { "Accept-Language", "en-US,en; q=0.9" },
-            { "Accept-Encoding", "gzip, deflate" },
-            { "Host", "www.tiktok.com" }
+            { "Accept-Encoding", "gzip, deflate" }
         };
 
         public ProxyContainer proxyContainer { get; }
@@ -38,7 +37,7 @@ namespace TikTokLiveSharp.Client
 
         internal TikTokHTTPClient(TimeSpan? timeout, ProxyContainer proxyContainer = null, Dictionary<string, string> additionalHeaders = null)
         {
-            this.Timeout = timeout ?? TimeSpan.FromSeconds(1);
+            this.Timeout = timeout ?? TimeSpan.FromSeconds(2);
             this.proxyContainer = proxyContainer ?? new ProxyContainer(false);
         }
 
@@ -83,7 +82,7 @@ namespace TikTokLiveSharp.Client
 
         internal async Task<string> GetLivestreamPage(string userID)
         {
-            return await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live").ReceiveString();
+            return await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live/").ReceiveString();
         }
 
         internal async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
