@@ -92,7 +92,7 @@ namespace TikTokLiveSharp.Client
             }
 
             this.http = new TikTokHTTPClient(timeout, proxyContainer, headers);
-            this.pollingInterval = pollingInterval ?? TimeSpan.FromMilliseconds(1000);
+            this.pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(1);
             this.processInitialData = processInitialData;
             this.fetchRoomInfoOnConnect = fetchRoomInfoOnConnect;
             this.enableExtendedGiftInfo = enableExtendedGiftInfo;
@@ -175,8 +175,10 @@ namespace TikTokLiveSharp.Client
         {
             var webcastResponse = await this.http.GetDeserializedMessage("im/fetch/", this.clientParams);
 
-            var lastCursor = this.clientParams["cursor"];
-            var nextCursor = webcastResponse.Cursor;
+            if (webcastResponse.Cursor != "0")
+            {
+                this.clientParams["cursor"] = webcastResponse.Cursor;
+            }
 
             if (isInitial && !this.processInitialData) return;
 
