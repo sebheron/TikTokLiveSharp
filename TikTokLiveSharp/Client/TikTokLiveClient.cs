@@ -8,7 +8,7 @@ using TikTokLiveSharp.Protobuf;
 
 namespace TikTokLiveSharp.Client
 {
-    internal class TikTokLiveClient : TikTokBaseClient
+    public class TikTokLiveClient : TikTokBaseClient
     {
         public TikTokLiveClient(string userID,
             bool debugMode = false,
@@ -31,10 +31,6 @@ namespace TikTokLiveSharp.Client
                 proxyContainer,
                 lang)
         { }
-
-        public TikTokLiveClient(string userID, bool debugMode = false) : base(userID)
-        {
-        }
 
         protected override async Task<string> connect()
         {

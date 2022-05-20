@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TikTokLiveSharp.Client.Proxy
 {
-    internal class ProxyContainer
+    public class ProxyContainer
     {
         private int index;
 

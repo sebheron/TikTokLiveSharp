@@ -9,61 +9,63 @@ using System.Text;
 using System.Threading.Tasks;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Protobuf;
+using Flurl.Http;
+using Flurl;
 
 namespace TikTokLiveSharp.Client
 {
-    internal class TikTokHTTPClient
+    public class TikTokHTTPClient
     {
         private const string TIKTOK_URL_WEB = "https://www.tiktok.com/";
         private const string TIKTOK_URL_WEBCAST = "https://webcast.tiktok.com/webcast/";
 
         private static readonly Dictionary<string, string> DEFAULT_REQUEST_HEADERS = new Dictionary<string, string>()
         {
-            { "Connection", "keep-alive"},
-            { "Cache-Control", "max-age=0"},
-            { "Accept", "text/html,application/json,application/protobuf"},
-            { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,like Gecko) Chrome/97.0.4692.99 Safari/537.36"},
-            { "Referer", "https,//www.tiktok.com/"},
-            { "Origin", "https,//www.tiktok.com"},
-            { "Accept-Language", "en-US,en; q=0.9"},
-            { "Accept-Encoding", "gzip,deflate"}
+            { "Connection", "keep-alive" },
+            { "Cache-Control", "max-age=0" },
+            { "Accept", "text/html,application/json,application/protobuf" },
+            { "User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36" },
+            { "Referer", "https,//www.tiktok.com/" },
+            { "Origin", "https,//www.tiktok.com" },
+            { "Accept-Language", "en-US,en; q=0.9" },
+            { "Accept-Encoding", "gzip, deflate" },
+            { "Host", "www.tiktok.com" }
         };
 
-        private readonly HttpClient client;
-        private readonly HttpClientHandler handler;
         public ProxyContainer proxyContainer { get; }
+
+        public TimeSpan Timeout { get; }
 
         internal TikTokHTTPClient(TimeSpan? timeout, ProxyContainer proxyContainer = null, Dictionary<string, string> additionalHeaders = null)
         {
-            this.handler = new HttpClientHandler();
-            this.client = new HttpClient(this.handler);
-            this.client.Timeout = timeout ?? TimeSpan.FromMilliseconds(10);
-            this.client.DefaultRequestHeaders.Clear();
-            foreach (var header in DEFAULT_REQUEST_HEADERS)
-            {
-                this.client.DefaultRequestHeaders.Add(header.Key, header.Value);
-            }
-            for (int i = 0; i < (additionalHeaders?.Count ?? 0); i++)
-            {
-                var vals = additionalHeaders.ElementAt(i);
-                this.client.DefaultRequestHeaders.Add(vals.Key, vals.Value);
-            }
+            this.Timeout = timeout ?? TimeSpan.FromSeconds(1);
             this.proxyContainer = proxyContainer ?? new ProxyContainer(false);
         }
 
-        private async Task<byte[]> GetRequest(string url, Dictionary<string, object> parameters = null)
+        private IFlurlRequest BuildFlurlRequest(string url, Dictionary<string, object> parameters = null)
         {
-            this.handler.Proxy = new WebProxy(this.proxyContainer.Get());
-            var request = await this.client.GetAsync($"{url}?{this.BuildQueryString(parameters ?? new Dictionary<string, object>())}");
-            return await request.Content.ReadAsByteArrayAsync();
+            var request = url.WithHeaders(DEFAULT_REQUEST_HEADERS)
+                .WithTimeout(this.Timeout);
+            for (int i = 0; i < (parameters?.Count ?? 0); i++)
+            {
+                var vals = parameters.ElementAt(i);
+                request.SetQueryParam(vals.Key, vals.Value);
+            }
+            return request;
         }
 
-        private async Task<string> PostRequest(string url, string data, Dictionary<string, object> parameters = null)
+        private async Task<IFlurlResponse> GetRequest(string url, Dictionary<string, object> parameters = null)
         {
-            this.handler.Proxy = new WebProxy(this.proxyContainer.Get());
-            var request = await this.client.PostAsync($"{url}?{this.BuildQueryString(parameters ?? new Dictionary<string, object>())}",
-                new StringContent(data, Encoding.UTF8));
-            return await request.Content.ReadAsStringAsync();
+            //this.handler.Proxy = new WebProxy(this.proxyContainer.Get());
+            var request = this.BuildFlurlRequest(url, parameters);
+            return await request.GetAsync();
+        }
+
+        private async Task<IFlurlResponse> PostRequest(string url, string data, Dictionary<string, object> parameters = null)
+        {
+            //this.handler.Proxy = new WebProxy(this.proxyContainer.Get());
+            var request = this.BuildFlurlRequest(url, parameters);
+            return await request.PostAsync(new StringContent(data, Encoding.UTF8));
         }
 
         private string BuildQueryString(Dictionary<string, object> parameters)
@@ -81,26 +83,24 @@ namespace TikTokLiveSharp.Client
 
         internal async Task<string> GetLivestreamPage(string userID)
         {
-            var bytes = await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live");
-            return Encoding.UTF8.GetString(bytes);
+            return await this.GetRequest($"{TIKTOK_URL_WEB}@{userID}/live").ReceiveString();
         }
 
         internal async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
         {
-            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
-            return Serializer.Deserialize<WebcastResponse>(new ReadOnlyMemory<byte>(bytes));
+            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters).ReceiveStream();
+            return Serializer.Deserialize<WebcastResponse>(bytes);
         }
 
         internal async Task<JObject> GetJObjectFromWebcastAPI(string path, Dictionary<string, object> parameters)
         {
-            var bytes = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters);
-            var json = Encoding.UTF8.GetString(bytes);
+            var json = await this.GetRequest(TIKTOK_URL_WEBCAST + path, parameters).ReceiveString();
             return JObject.Parse(json);
         }
 
         internal async Task<JObject> PostJObjecttToWebcastAPI(string path, Dictionary<string, object> parameters, JObject json)
         {
-            var replyJson = await this.PostRequest(TIKTOK_URL_WEBCAST + path, json.ToString(Newtonsoft.Json.Formatting.None), parameters);
+            var replyJson = await this.PostRequest(TIKTOK_URL_WEBCAST + path, json.ToString(Newtonsoft.Json.Formatting.None), parameters).ReceiveString();
             return JObject.Parse(replyJson);
         }
     }

@@ -11,7 +11,7 @@ using TikTokLiveSharp.Protobuf;
 
 namespace TikTokLiveSharp.Client
 {
-    internal abstract class TikTokBaseClient
+    public abstract class TikTokBaseClient
     {
         private static readonly Dictionary<string, object> DEFAULT_CLIENT_PARAMS = new Dictionary<string, object>()
         {
@@ -197,7 +197,7 @@ namespace TikTokLiveSharp.Client
 
                 if (this.fetchRoomInfoOnConnect)
                 {
-                    var status = (await this.fetchRoomInfo()).SelectTokens(".status");
+                    var status = (await this.fetchRoomInfo()).SelectToken(".status");
                     if (status == null || status.Value<int>() == 4)
                     {
                         throw new LiveNotFoundException();

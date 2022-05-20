@@ -7,7 +7,7 @@ namespace TikTokLiveSharp.Client.Proxy
     /// <summary>
     /// Rotation settings for a proxy container.
     /// </summary>
-    internal enum RotationSettings
+    public enum RotationSettings
     {
         /// <summary>
         /// Rotate proxies consecutively, from proxy 0 -> 1 -> 2 -> ...etc.
