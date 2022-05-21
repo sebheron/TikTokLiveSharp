@@ -11,7 +11,7 @@ namespace TikTokLiveSharpTestApplication
             Console.WriteLine("Enter a username:");
             var client = new TikTokLiveClient(Console.ReadLine());
             client.OnCommentRecieved += Client_OnCommentRecieved;
-            client.Run();
+            client.Run(new System.Threading.CancellationToken());
         }
 
         private static void Client_OnCommentRecieved(object sender, WebcastChatMessage e)

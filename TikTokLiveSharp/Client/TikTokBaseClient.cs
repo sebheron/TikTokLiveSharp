@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Errors;
@@ -228,10 +229,10 @@ namespace TikTokLiveSharp.Client
             return await this.Connect();
         }
 
-        public void Run(string sessionID = null)
+        public void Run(CancellationToken? cancellationToken = null, string sessionID = null)
         {
             this.sessionID = sessionID;
-            var run = Task.Run(this.Connect);
+            var run = Task.Run(this.Connect, cancellationToken ?? new CancellationToken());
             run.Wait();
             this.runningTask.Wait();
         }
