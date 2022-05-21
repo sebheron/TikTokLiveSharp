@@ -50,22 +50,9 @@ namespace TikTokLiveSharp.Client
             return await request.PostAsync(new StringContent(data, Encoding.UTF8));
         }
 
-        private string BuildQueryString(Dictionary<string, object> parameters)
+        internal async Task<string> GetLivestreamPage(string uniqueID)
         {
-            var queryString = new StringBuilder();
-            foreach (var key in parameters.Keys)
-            {
-                queryString.Append(key);
-                queryString.Append("=");
-                queryString.Append(parameters[key]);
-                queryString.Append("&");
-            }
-            return queryString.ToString();
-        }
-
-        internal async Task<string> GetLivestreamPage(string userID)
-        {
-            return await this.GetRequest($"{TikTokRequestSettings.TIKTOK_URL_WEB}@{userID}/live/").ReceiveString();
+            return await this.GetRequest($"{TikTokRequestSettings.TIKTOK_URL_WEB}@{uniqueID}/live/").ReceiveString();
         }
 
         internal async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
