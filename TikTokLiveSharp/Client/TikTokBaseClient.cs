@@ -13,35 +13,7 @@ namespace TikTokLiveSharp.Client
 {
     public abstract class TikTokBaseClient
     {
-        private static readonly Dictionary<string, object> DEFAULT_CLIENT_PARAMS = new Dictionary<string, object>()
-        {
-            { "aid", 1988 },
-            { "app_name", "tiktok_web" },
-            { "browser_name", "Mozilla" },
-            { "browser_online", true },
-            { "browser_platform", "Win32" },
-            { "version_code", 180800 },
-            { "browser_version", "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36" },
-            { "cookie_enabled", true },
-            { "cursor", "" },
-            { "device_platform", "web" },
-            { "did_rule", 3 },
-            { "fetch_rule", 1 },
-            { "identity", "audience" },
-            { "internal_ext", "" },
-            { "last_rtt", 0 },
-            { "live_id", 12 },
-            { "resp_content_type", "protobuf" },
-            { "screen_height", 1152 },
-            { "screen_width", 2048 },
-            { "tz_name", "Europe/Berlin" },
-            { "browser_language", "en" },
-            { "priority_region", "US" },
-            { "region", "US" }
-        };
-
         private string userID;
-        private bool? discardExtraEvents;
         private JObject roomInfo;
         private Dictionary<int, JToken> availableGifts;
         private string roomID;
@@ -64,11 +36,10 @@ namespace TikTokLiveSharp.Client
             bool processInitialData = true,
             bool fetchRoomInfoOnConnect = true,
             bool enableExtendedGiftInfo = true,
-            ProxyContainer proxyContainer = null,
+            ProxyClientFactory proxyClientFactory = null,
             string lang = "en-US")
         {
             this.userID = userID;
-            this.discardExtraEvents = null;
             this.roomInfo = null;
             this.availableGifts = new Dictionary<int, JToken>();
             this.roomID = null;
@@ -77,11 +48,8 @@ namespace TikTokLiveSharp.Client
             this.connected = false;
             this.sessionID = null;
 
-            DEFAULT_CLIENT_PARAMS["app_language"] = lang;
-            DEFAULT_CLIENT_PARAMS["webcast_language"] = lang;
-
             this.clientParams = new Dictionary<string, object>();
-            foreach (var parameter in DEFAULT_CLIENT_PARAMS)
+            foreach (var parameter in TikTokRequestSettings.DEFAULT_CLIENT_PARAMS)
             {
                 this.clientParams[parameter.Key] = parameter.Value;
             }
@@ -91,7 +59,10 @@ namespace TikTokLiveSharp.Client
                 this.clientParams[vals.Key] = vals.Value;
             }
 
-            this.http = new TikTokHTTPClient(timeout, proxyContainer, headers);
+            this.clientParams["app_language"] = lang;
+            this.clientParams["webcast_language"] = lang;
+
+            this.http = new TikTokHTTPClient(timeout, proxyClientFactory);
             this.pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(1);
             this.processInitialData = processInitialData;
             this.fetchRoomInfoOnConnect = fetchRoomInfoOnConnect;
@@ -235,7 +206,16 @@ namespace TikTokLiveSharp.Client
             await this.runningTask;
         }
 
-        public async Task stop()
+        protected async Task<JObject> retrieveRoomInfo()
+        {
+            if (!this.connected)
+            {
+                await this.fetchRoomId();
+            }
+            return await this.fetchRoomInfo();
+        }
+
+        public async Task Stop()
         {
             if (this.connected)
             {
@@ -243,7 +223,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        public async Task<string> start(string sessionID = null)
+        public async Task<string> Start(string sessionID = null)
         {
             this.sessionID = sessionID;
             return await this.connect();
@@ -255,34 +235,6 @@ namespace TikTokLiveSharp.Client
             var run = Task.Run(this.connect);
             run.Wait();
             this.runningTask.Wait();
-        }
-
-        public async Task<JObject> RetrieveRoomInfo()
-        {
-            if (!this.connected)
-            {
-                await this.fetchRoomId();
-            }
-            return await this.fetchRoomInfo();
-        }
-
-        public void SetProxiesEnabled(bool enabled)
-        {
-            this.http.proxyContainer.Enabled = enabled;
-        }
-
-        public void AddProxies(params string[] proxies)
-        {
-            this.http.proxyContainer.proxies.AddRange(proxies);
-        }
-
-        public void RemoveProxies(params string[] proxies)
-        {
-            this.http.proxyContainer.proxies.RemoveAll(x => proxies.Contains(x));
-        }
-        public IList<string> GetProxies()
-        {
-            return this.http.proxyContainer.proxies;
         }
 
         public int? ViewerCount => this.viewerCount;
