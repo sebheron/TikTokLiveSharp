@@ -7,14 +7,16 @@ using System.Linq;
 
 namespace TikTokLiveSharp.Client.Proxy
 {
-    internal class ProxyClientFactory : DefaultHttpClientFactory
+    public class ProxyClientFactory : DefaultHttpClientFactory
     {
         /// <summary>
         /// Creates an instance of proxy client factory.
         /// </summary>
+        /// <param name="isEnabled">Are proxies enabled.</param>
         /// <param name="settings">The inital rotation settings to use.</param>
         /// <param name="addresses">The list of inital addresses.</param>
-        public ProxyClientFactory(RotationSettings settings = RotationSettings.CONSECUTIVE,
+        public ProxyClientFactory(bool isEnabled = false,
+            RotationSettings settings = RotationSettings.CONSECUTIVE,
             params string[] addresses)
         {
             this.Settings = settings;
