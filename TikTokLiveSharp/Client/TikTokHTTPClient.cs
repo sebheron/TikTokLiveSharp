@@ -31,14 +31,11 @@ namespace TikTokLiveSharp.Client
             { "Accept-Encoding", "gzip, deflate" }
         };
 
-        public ProxyContainer proxyContainer { get; }
-
         public TimeSpan Timeout { get; }
 
-        internal TikTokHTTPClient(TimeSpan? timeout, ProxyContainer proxyContainer = null, Dictionary<string, string> additionalHeaders = null)
+        internal TikTokHTTPClient(TimeSpan? timeout, Dictionary<string, string> additionalHeaders = null)
         {
             this.Timeout = timeout ?? TimeSpan.FromSeconds(2);
-            this.proxyContainer = proxyContainer ?? new ProxyContainer(false);
         }
 
         private IFlurlRequest BuildFlurlRequest(string url, Dictionary<string, object> parameters = null)

@@ -35,9 +35,9 @@ namespace TikTokLiveSharp.Client
         protected override async Task<string> connect()
         {
             var roomID = await base.connect();
-            if (this.Connected && this.OnConnection != null)
+            if (this.Connected && this.OnConnected != null)
             {
-                this.OnConnection.Invoke(this, new ConnectionEventArgs(true));
+                this.OnConnected.Invoke(this, new ConnectionEventArgs(true));
             }
             return roomID;
         }
@@ -45,9 +45,9 @@ namespace TikTokLiveSharp.Client
         protected override async Task disconnect()
         {
             await base.disconnect();
-            if (!this.Connected && this.OnConnection != null)
+            if (!this.Connected && this.OnDisconnected != null)
             {
-                this.OnConnection.Invoke(this, new ConnectionEventArgs(false));
+                this.OnDisconnected.Invoke(this, new ConnectionEventArgs(false));
             }
         }
 
@@ -79,7 +79,8 @@ namespace TikTokLiveSharp.Client
         }
 
         public event EventHandler<CommentEventArgs> OnCommentRecieved;
-        public event EventHandler<ConnectionEventArgs> OnConnection;
+        public event EventHandler<ConnectionEventArgs> OnConnected;
+        public event EventHandler<ConnectionEventArgs> OnDisconnected;
         public event EventHandler<GiftEventArgs> OnGiftRecieved;
         public event EventHandler<LikeEventArgs> OnLikesRecieved;
         public event EventHandler<QuestionEventArgs> OnQuestionRecieved;
