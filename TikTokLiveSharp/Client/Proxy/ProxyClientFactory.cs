@@ -19,6 +19,7 @@ namespace TikTokLiveSharp.Client.Proxy
             RotationSettings settings = RotationSettings.CONSECUTIVE,
             params string[] addresses)
         {
+            this.IsEnabled = isEnabled;
             this.Settings = settings;
             this.Addresses = addresses.ToList();
         }
