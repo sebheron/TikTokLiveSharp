@@ -13,7 +13,7 @@ namespace TikTokLiveSharp.Client
 {
     public abstract class TikTokBaseClient
     {
-        private string userID;
+        private string uniqueID;
         private JObject roomInfo;
         private Dictionary<int, JToken> availableGifts;
         private string roomID;
@@ -28,18 +28,17 @@ namespace TikTokLiveSharp.Client
         protected TimeSpan pollingInterval;
         protected bool isPolling, processInitialData, fetchRoomInfoOnConnect, enableExtendedGiftInfo;
 
-        public TikTokBaseClient(string userID,
+        public TikTokBaseClient(string uniqueID,
             TimeSpan? timeout = null,
             TimeSpan? pollingInterval = null,
             Dictionary<string, object> clientParams = null,
-            Dictionary<string, string> headers = null,
             bool processInitialData = true,
             bool fetchRoomInfoOnConnect = true,
             bool enableExtendedGiftInfo = true,
             ProxyClientFactory proxyClientFactory = null,
             string lang = "en-US")
         {
-            this.userID = userID;
+            this.uniqueID = uniqueID;
             this.roomInfo = null;
             this.availableGifts = new Dictionary<int, JToken>();
             this.roomID = null;
@@ -69,11 +68,11 @@ namespace TikTokLiveSharp.Client
             this.enableExtendedGiftInfo = enableExtendedGiftInfo;
         }
 
-        protected async Task<string> fetchRoomId()
+        protected async Task<string> FetchRoomId()
         {
             try
             {
-                var html = await this.http.GetLivestreamPage(this.userID);
+                var html = await this.http.GetLivestreamPage(this.uniqueID);
                 var first = Regex.Match(html, "room_id=([0-9]*)");
                 var second = Regex.Match(html, "\"roomId\":\"([0 - 9] *)\"");
                 var id = first.Groups[1]?.Value ?? (second.Groups[1]?.Value ?? String.Empty);
@@ -91,7 +90,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        protected async Task<JObject> fetchRoomInfo()
+        protected async Task<JObject> FetchRoomInfo()
         {
             try
             {
@@ -105,7 +104,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        protected async Task<Dictionary<int, JToken>> fetchAvailableGifts()
+        protected async Task<Dictionary<int, JToken>> FetchAvailableGifts()
         {
             try
             {
@@ -123,7 +122,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        protected async Task fetchRoomPolling()
+        protected async Task FetchRoomPolling()
         {
             this.isPolling = true;
 
@@ -131,7 +130,7 @@ namespace TikTokLiveSharp.Client
             {
                 try
                 {
-                    await this.fetchRoomData();
+                    await this.FetchRoomData();
                 }
                 catch (Exception e)
                 {
@@ -142,7 +141,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        protected async Task fetchRoomData(bool isInitial = false)
+        protected async Task FetchRoomData(bool isInitial = false)
         {
             var webcastResponse = await this.http.GetDeserializedMessage("im/fetch/", this.clientParams);
 
@@ -153,12 +152,12 @@ namespace TikTokLiveSharp.Client
 
             if (isInitial && !this.processInitialData) return;
 
-            this.handleWebcastMessages(webcastResponse);
+            this.HandleWebcastMessages(webcastResponse);
         }
 
-        protected abstract void handleWebcastMessages(WebcastResponse webcastResponse);
+        protected abstract void HandleWebcastMessages(WebcastResponse webcastResponse);
 
-        protected virtual async Task<string> connect()
+        protected virtual async Task<string> Connect()
         {
             if (this.connecting) throw new AlreadyConnectingException();
             if (this.connected) throw new AlreadyConnectedException();
@@ -167,11 +166,11 @@ namespace TikTokLiveSharp.Client
 
             try
             {
-                await this.fetchRoomId();
+                await this.FetchRoomId();
 
                 if (this.fetchRoomInfoOnConnect)
                 {
-                    var status = (await this.fetchRoomInfo()).SelectToken(".data").SelectToken(".status");
+                    var status = (await this.FetchRoomInfo()).SelectToken(".data").SelectToken(".status");
                     if (status == null || status.Value<int>() == 4)
                     {
                         throw new LiveNotFoundException();
@@ -180,13 +179,13 @@ namespace TikTokLiveSharp.Client
 
                 if (this.enableExtendedGiftInfo)
                 {
-                    await this.fetchAvailableGifts();
+                    await this.FetchAvailableGifts();
                 }
 
-                await this.fetchRoomData(true);
+                await this.FetchRoomData(true);
                 this.connected = true;
 
-                this.runningTask = Task.Run(this.fetchRoomPolling);
+                this.runningTask = Task.Run(this.FetchRoomPolling);
 
                 return this.roomID;
             }
@@ -196,7 +195,7 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        protected virtual async Task disconnect()
+        protected virtual async Task Disconnect()
         {
             this.isPolling = false;
             this.roomInfo = null;
@@ -206,36 +205,38 @@ namespace TikTokLiveSharp.Client
             await this.runningTask;
         }
 
-        protected async Task<JObject> retrieveRoomInfo()
+        protected async Task<JObject> RetrieveRoomInfo()
         {
             if (!this.connected)
             {
-                await this.fetchRoomId();
+                await this.FetchRoomId();
             }
-            return await this.fetchRoomInfo();
+            return await this.FetchRoomInfo();
         }
 
         public async Task Stop()
         {
             if (this.connected)
             {
-                await this.disconnect();
+                await this.Disconnect();
             }
         }
 
         public async Task<string> Start(string sessionID = null)
         {
             this.sessionID = sessionID;
-            return await this.connect();
+            return await this.Connect();
         }
 
         public void Run(string sessionID = null)
         {
             this.sessionID = sessionID;
-            var run = Task.Run(this.connect);
+            var run = Task.Run(this.Connect);
             run.Wait();
             this.runningTask.Wait();
         }
+
+        public string SessionID => this.sessionID;
 
         public int? ViewerCount => this.viewerCount;
 
@@ -243,7 +244,7 @@ namespace TikTokLiveSharp.Client
 
         public JObject RoomInfo => this.roomInfo;
 
-        public string UserID => this.userID;
+        public string UniqueID => this.uniqueID;
 
         public bool Connected => this.connected;
 
