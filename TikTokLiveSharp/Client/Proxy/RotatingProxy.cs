@@ -1,13 +1,11 @@
-﻿using Flurl.Http.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Linq;
+using System.Net;
 
 namespace TikTokLiveSharp.Client.Proxy
 {
-    public class ProxyClientFactory : DefaultHttpClientFactory
+    public class RotatingProxy : IWebProxy
     {
         /// <summary>
         /// Creates an instance of proxy client factory.
@@ -15,7 +13,7 @@ namespace TikTokLiveSharp.Client.Proxy
         /// <param name="isEnabled">Are proxies enabled.</param>
         /// <param name="settings">The inital rotation settings to use.</param>
         /// <param name="addresses">The list of inital addresses.</param>
-        public ProxyClientFactory(bool isEnabled = false,
+        public RotatingProxy(bool isEnabled = false,
             RotationSettings settings = RotationSettings.CONSECUTIVE,
             params string[] addresses)
         {
@@ -24,39 +22,29 @@ namespace TikTokLiveSharp.Client.Proxy
             this.Addresses = addresses.ToList();
         }
 
-        public override HttpMessageHandler CreateMessageHandler()
+        public Uri GetProxy(Uri destination)
         {
-            return new HttpClientHandler
-            {
-                Proxy = this.GetProxy(),
-                UseProxy = this.IsEnabled
-            };
-        }
-
-        /// <summary>
-        /// Gets the current proxy to use.
-        /// </summary>
-        /// <returns>WebProxy for the current indexed address.</returns>
-        private WebProxy GetProxy()
-        {
-            if (!IsEnabled) return null;
-            var address = this.Addresses.FirstOrDefault();
-            if (this.Addresses.Count <= 0) return null;
+            if (!IsEnabled) return destination;
+            if (this.Addresses.Count <= 0) return destination;
             switch (Settings)
             {
                 case RotationSettings.CONSECUTIVE:
-                    address = this.Addresses[this.Index];
+                    var address = this.Addresses[this.Index];
                     this.Index = (this.Index + 1) % this.Count;
-                    break;
+                    return new Uri(address);
                 case RotationSettings.RANDOM:
                     this.Index = new Random().Next(this.Count - 1);
-                    address = this.Addresses[this.Index];
-                    break;
+                    return new Uri(this.Addresses[this.Index]);
                 case RotationSettings.PINNED:
-                    address = this.Addresses[this.Index];
-                    break;
+                    return new Uri(this.Addresses[this.Index]);
+                default:
+                    return destination;
             }
-            return new WebProxy(address);
+        }
+
+        public bool IsBypassed(Uri host)
+        {
+            return IsEnabled;
         }
 
         /// <summary>
@@ -93,5 +81,10 @@ namespace TikTokLiveSharp.Client.Proxy
         /// The number of currently available addresses.
         /// </summary>
         public int Count => this.Addresses.Count;
+
+        /// <summary>
+        /// Not implemented
+        /// </summary>
+        public ICredentials Credentials { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }
