@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Events;
@@ -57,37 +58,36 @@ namespace TikTokLiveSharp.Client
 
         private void InvokeEvent(Message message)
         {
-            ReadOnlyMemory<byte> bytes = new ReadOnlyMemory<byte>(message.Binary);
-
+            using (var stream = new MemoryStream(message.Binary))
             switch (message.Type)
             {
                 case nameof(WebcastChatMessage):
-                    var chatMessage = ProtoBuf.Serializer.Deserialize<WebcastChatMessage>(bytes);
+                    var chatMessage = ProtoBuf.Serializer.Deserialize<WebcastChatMessage>(stream);
                     if (OnCommentRecieved != null)
                         this.OnCommentRecieved.Invoke(this, chatMessage);
                     return;
                 case nameof(WebcastGiftMessage):
-                    var giftMessage = ProtoBuf.Serializer.Deserialize<WebcastGiftMessage>(bytes);
+                    var giftMessage = ProtoBuf.Serializer.Deserialize<WebcastGiftMessage>(stream);
                     if (OnGiftRecieved != null)
                         this.OnGiftRecieved.Invoke(this, giftMessage);
                     return;
                 case nameof(WebcastLikeMessage):
-                    var likeMessage = ProtoBuf.Serializer.Deserialize<WebcastLikeMessage>(bytes);
+                    var likeMessage = ProtoBuf.Serializer.Deserialize<WebcastLikeMessage>(stream);
                     if (OnLikesRecieved != null)
                         this.OnLikesRecieved.Invoke(this, likeMessage);
                     return;
                 case nameof(WebcastQuestionNewMessage):
-                    var questionMessage = ProtoBuf.Serializer.Deserialize<WebcastQuestionNewMessage>(bytes);
+                    var questionMessage = ProtoBuf.Serializer.Deserialize<WebcastQuestionNewMessage>(stream);
                     if (OnQuestionRecieved != null)
                         this.OnQuestionRecieved.Invoke(this, questionMessage);
                     return;
                 case nameof(WebcastRoomUserSeqMessage):
-                    var roomMessage = ProtoBuf.Serializer.Deserialize<WebcastRoomUserSeqMessage>(bytes);
+                    var roomMessage = ProtoBuf.Serializer.Deserialize<WebcastRoomUserSeqMessage>(stream);
                     if (OnViewerCountUpdated != null)
                         this.OnViewerCountUpdated.Invoke(this, roomMessage);
                     return;
                 case nameof(WebcastSocialMessage):
-                    var eventMessage = ProtoBuf.Serializer.Deserialize<WebcastSocialMessage>(bytes);
+                    var eventMessage = ProtoBuf.Serializer.Deserialize<WebcastSocialMessage>(stream);
                     this.InvokeSpecialEvent(eventMessage);
                     return;
             }
