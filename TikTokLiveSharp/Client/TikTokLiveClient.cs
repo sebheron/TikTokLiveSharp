@@ -16,7 +16,7 @@ namespace TikTokLiveSharp.Client
             bool processInitialData = true,
             bool fetchRoomInfoOnConnect = true,
             bool enableExtendedGiftInfo = true,
-            ProxyClientFactory proxyClientFactory = null,
+            RotatingProxy proxyHandler = null,
             string lang = "en-US") : base(uniqueID,
                 timeout,
                 pollingInterval,
@@ -24,7 +24,7 @@ namespace TikTokLiveSharp.Client
                 processInitialData,
                 fetchRoomInfoOnConnect,
                 enableExtendedGiftInfo,
-                proxyClientFactory,
+                proxyHandler,
                 lang)
         { }
 

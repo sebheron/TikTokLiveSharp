@@ -36,7 +36,7 @@ namespace TikTokLiveSharp.Client
             bool processInitialData = true,
             bool fetchRoomInfoOnConnect = true,
             bool enableExtendedGiftInfo = true,
-            ProxyClientFactory proxyClientFactory = null,
+            RotatingProxy proxyHandler = null,
             string lang = "en-US")
         {
             this.uniqueID = uniqueID;
@@ -62,7 +62,7 @@ namespace TikTokLiveSharp.Client
             this.clientParams["app_language"] = lang;
             this.clientParams["webcast_language"] = lang;
 
-            this.http = new TikTokHTTPClient(timeout, proxyClientFactory);
+            this.http = new TikTokHTTPClient(timeout, proxyHandler);
             this.pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(1);
             this.processInitialData = processInitialData;
             this.fetchRoomInfoOnConnect = fetchRoomInfoOnConnect;
