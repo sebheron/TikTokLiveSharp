@@ -42,17 +42,10 @@ namespace TikTokLiveSharp.Client
             return await request.Post(new StringContent(data, Encoding.UTF8));
         }
 
-        public async Task<string> GetStringAsync(HttpContent content)
-        {
-            // Borrowed from Flurl.
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            return await content.ReadAsStringAsync();
-        }
-
         internal async Task<string> GetLivestreamPage(string uniqueID)
         {
             var get = await this.GetRequest($"{TikTokRequestSettings.TIKTOK_URL_WEB}@{uniqueID}/live/");
-            return await this.GetStringAsync(get);
+            return await get.ReadAsStringAsync();
         }
 
         internal async Task<WebcastResponse> GetDeserializedMessage(string path, Dictionary<string, object> parameters)
@@ -64,13 +57,13 @@ namespace TikTokLiveSharp.Client
         internal async Task<JObject> GetJObjectFromWebcastAPI(string path, Dictionary<string, object> parameters)
         {
             var get = await this.GetRequest(TikTokRequestSettings.TIKTOK_URL_WEBCAST + path, parameters);
-            return JObject.Parse(await this.GetStringAsync(get));
+            return JObject.Parse(await get.ReadAsStringAsync());
         }
 
         internal async Task<JObject> PostJObjecttToWebcastAPI(string path, Dictionary<string, object> parameters, JObject json)
         {
             var post = await this.PostRequest(TikTokRequestSettings.TIKTOK_URL_WEBCAST + path, json.ToString(Newtonsoft.Json.Formatting.None), parameters);
-            return JObject.Parse(await this.GetStringAsync(post));
+            return JObject.Parse(await post.ReadAsStringAsync());
         }
     }
 }
