@@ -219,6 +219,10 @@ namespace TikTokLiveSharp.Client
             return await this.FetchRoomInfo();
         }
 
+        /// <summary>
+        /// Stops the client.
+        /// </summary>
+        /// <returns>Awaitable task.</returns>
         public async Task Stop()
         {
             if (this.connected)
