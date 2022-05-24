@@ -21,8 +21,8 @@ namespace TikTokLiveSharp.Client
         private int? viewerCount;
         private bool connecting;
         private bool connected;
-        private string sessionID;
         private Task runningTask;
+        private CancellationToken token;
 
         protected Dictionary<string, object> clientParams;
         protected TikTokHTTPClient http;
@@ -46,7 +46,6 @@ namespace TikTokLiveSharp.Client
             this.viewerCount = null;
             this.connecting = false;
             this.connected = false;
-            this.sessionID = null;
 
             this.clientParams = new Dictionary<string, object>();
             foreach (var parameter in TikTokRequestSettings.DEFAULT_CLIENT_PARAMS)
@@ -139,6 +138,7 @@ namespace TikTokLiveSharp.Client
                 }
 
                 await Task.Delay(this.pollingInterval);
+                token.ThrowIfCancellationRequested();
             }
         }
 
@@ -168,6 +168,7 @@ namespace TikTokLiveSharp.Client
             try
             {
                 await this.FetchRoomId();
+                token.ThrowIfCancellationRequested();
 
                 if (this.fetchRoomInfoOnConnect)
                 {
@@ -177,22 +178,25 @@ namespace TikTokLiveSharp.Client
                         throw new LiveNotFoundException();
                     }
                 }
+                token.ThrowIfCancellationRequested();
 
                 if (this.enableExtendedGiftInfo)
                 {
                     await this.FetchAvailableGifts();
                 }
+                token.ThrowIfCancellationRequested();
 
                 await this.FetchRoomData(true);
+                token.ThrowIfCancellationRequested();
                 this.connected = true;
 
-                this.runningTask = Task.Run(this.FetchRoomPolling);
+                this.runningTask = Task.Run(this.FetchRoomPolling, token);
 
                 return this.roomID;
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message, new FailedConnectionException());
+                throw new FailedConnectionException(e.Message);
             }
         }
 
@@ -223,21 +227,43 @@ namespace TikTokLiveSharp.Client
             }
         }
 
-        public async Task<string> Start(string sessionID = null)
+        /// <summary>
+        /// Async method to start the client.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token to use.</param>
+        /// <param name="retryConnection">Recurssively attempt to start a connection until either a connection is formed or cancellation is requested.</param>
+        /// <returns>The room ID.</returns>
+        public async Task<string> Start(CancellationToken? cancellationToken = null, bool retryConnection = false)
         {
-            this.sessionID = sessionID;
-            return await this.Connect();
+            this.token = cancellationToken ?? new CancellationToken();
+            token.ThrowIfCancellationRequested();
+            try
+            {
+                return await this.Connect();
+            }
+            catch (FailedConnectionException)
+            {
+                if (retryConnection)
+                {
+                    await Task.Delay(this.pollingInterval);
+                    return await Start(cancellationToken, retryConnection);
+                }
+                return null;
+            }
         }
 
-        public void Run(CancellationToken? cancellationToken = null, string sessionID = null)
+        /// <summary>
+        /// Async method to start the client.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token to use.</param>
+        public void Run(CancellationToken? cancellationToken = null, bool retryConnection = false)
         {
-            this.sessionID = sessionID;
-            var run = Task.Run(this.Connect, cancellationToken ?? new CancellationToken());
+            this.token = cancellationToken ?? new CancellationToken();
+            token.ThrowIfCancellationRequested();
+            var run = Task.Run(() => this.Start(token, retryConnection), token);
             run.Wait();
             this.runningTask.Wait();
         }
-
-        public string SessionID => this.sessionID;
 
         public int? ViewerCount => this.viewerCount;
 
