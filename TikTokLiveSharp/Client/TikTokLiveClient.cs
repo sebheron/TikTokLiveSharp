@@ -42,6 +42,68 @@ namespace TikTokLiveSharp.Client
                 lang)
         { }
 
+        /// <summary>
+        /// Event thrown when comments are recieved.
+        /// </summary>
+        public event EventHandler<WebcastChatMessage> OnCommentRecieved;
+
+        /// <summary>
+        /// Event thrown when the client connects.
+        /// </summary>
+        public event EventHandler<ConnectionEventArgs> OnConnected;
+
+        /// <summary>
+        /// Event thrown when the client disconnects.
+        /// </summary>
+        public event EventHandler<ConnectionEventArgs> OnDisconnected;
+
+        /// <summary>
+        /// Event thrown when someone follows.
+        /// </summary>
+        public event EventHandler<User> OnFollow;
+
+        /// <summary>
+        /// Event thrown when a gift is recieved.
+        /// </summary>
+        public event EventHandler<WebcastGiftMessage> OnGiftRecieved;
+
+        /// <summary>
+        /// Event thrown when someone joins the stream.
+        /// </summary>
+        public event EventHandler<User> OnJoin;
+
+        /// <summary>
+        /// Event thrown when someone likes the stream.
+        /// </summary>
+        public event EventHandler<User> OnLike;
+
+        /// <summary>
+        /// Event thrown when groups of likes are recieved.
+        /// Note: OnLike is more likely to be useful here, as OnLikesRecieved is called infrequently.
+        /// </summary>
+        public event EventHandler<WebcastLikeMessage> OnLikesRecieved;
+
+        /// <summary>
+        /// Event thrown when questions are recieved.
+        /// </summary>
+        public event EventHandler<WebcastQuestionNewMessage> OnQuestionRecieved;
+
+        /// <summary>
+        /// Event thrown when the stream is shared.
+        /// </summary>
+        public event EventHandler<User> OnShare;
+
+        /// <summary>
+        /// Event thrown when the view count updates.
+        /// </summary>
+        public event EventHandler<WebcastRoomUserSeqMessage> OnViewerCountUpdated;
+
+        /// <summary>
+        /// Event thrown when an unhandled event is recieved from the webcast.
+        /// It's up to you how you can interpret this message.
+        /// </summary>
+        public event EventHandler<Message> UnhandledEvent;
+
         protected override async Task<string> Connect()
         {
             var roomID = await base.Connect();
@@ -72,38 +134,43 @@ namespace TikTokLiveSharp.Client
         private void InvokeEvent(Message message)
         {
             using (var stream = new MemoryStream(message.Binary))
-            switch (message.Type)
-            {
-                case nameof(WebcastChatMessage):
-                    var chatMessage = ProtoBuf.Serializer.Deserialize<WebcastChatMessage>(stream);
-                    if (OnCommentRecieved != null)
-                        this.OnCommentRecieved.Invoke(this, chatMessage);
-                    return;
-                case nameof(WebcastGiftMessage):
-                    var giftMessage = ProtoBuf.Serializer.Deserialize<WebcastGiftMessage>(stream);
-                    if (OnGiftRecieved != null)
-                        this.OnGiftRecieved.Invoke(this, giftMessage);
-                    return;
-                case nameof(WebcastLikeMessage):
-                    var likeMessage = ProtoBuf.Serializer.Deserialize<WebcastLikeMessage>(stream);
-                    if (OnLikesRecieved != null)
-                        this.OnLikesRecieved.Invoke(this, likeMessage);
-                    return;
-                case nameof(WebcastQuestionNewMessage):
-                    var questionMessage = ProtoBuf.Serializer.Deserialize<WebcastQuestionNewMessage>(stream);
-                    if (OnQuestionRecieved != null)
-                        this.OnQuestionRecieved.Invoke(this, questionMessage);
-                    return;
-                case nameof(WebcastRoomUserSeqMessage):
-                    var roomMessage = ProtoBuf.Serializer.Deserialize<WebcastRoomUserSeqMessage>(stream);
-                    if (OnViewerCountUpdated != null)
-                        this.OnViewerCountUpdated.Invoke(this, roomMessage);
-                    return;
-                case nameof(WebcastSocialMessage):
-                    var eventMessage = ProtoBuf.Serializer.Deserialize<WebcastSocialMessage>(stream);
-                    this.InvokeSpecialEvent(eventMessage);
-                    return;
-            }
+                switch (message.Type)
+                {
+                    case nameof(WebcastChatMessage):
+                        var chatMessage = ProtoBuf.Serializer.Deserialize<WebcastChatMessage>(stream);
+                        if (OnCommentRecieved != null)
+                            this.OnCommentRecieved.Invoke(this, chatMessage);
+                        return;
+
+                    case nameof(WebcastGiftMessage):
+                        var giftMessage = ProtoBuf.Serializer.Deserialize<WebcastGiftMessage>(stream);
+                        if (OnGiftRecieved != null)
+                            this.OnGiftRecieved.Invoke(this, giftMessage);
+                        return;
+
+                    case nameof(WebcastLikeMessage):
+                        var likeMessage = ProtoBuf.Serializer.Deserialize<WebcastLikeMessage>(stream);
+                        if (OnLikesRecieved != null)
+                            this.OnLikesRecieved.Invoke(this, likeMessage);
+                        return;
+
+                    case nameof(WebcastQuestionNewMessage):
+                        var questionMessage = ProtoBuf.Serializer.Deserialize<WebcastQuestionNewMessage>(stream);
+                        if (OnQuestionRecieved != null)
+                            this.OnQuestionRecieved.Invoke(this, questionMessage);
+                        return;
+
+                    case nameof(WebcastRoomUserSeqMessage):
+                        var roomMessage = ProtoBuf.Serializer.Deserialize<WebcastRoomUserSeqMessage>(stream);
+                        if (OnViewerCountUpdated != null)
+                            this.OnViewerCountUpdated.Invoke(this, roomMessage);
+                        return;
+
+                    case nameof(WebcastSocialMessage):
+                        var eventMessage = ProtoBuf.Serializer.Deserialize<WebcastSocialMessage>(stream);
+                        this.InvokeSpecialEvent(eventMessage);
+                        return;
+                }
 
             if (UnhandledEvent != null)
                 this.UnhandledEvent.Invoke(this, message);
@@ -117,70 +184,22 @@ namespace TikTokLiveSharp.Client
                     if (OnLike != null)
                         this.OnLike.Invoke(this, null);
                     return;
+
                 case "live_room_enter_toast":
                     if (OnJoin != null)
                         this.OnJoin.Invoke(this, messageEvent.User);
                     return;
+
                 case "pm_main_follow_message_viewer_2":
                     if (OnFollow != null)
                         this.OnFollow.Invoke(this, messageEvent.User);
                     return;
+
                 case "pm_mt_guidance_share":
                     if (OnShare != null)
                         this.OnShare.Invoke(this, messageEvent.User);
                     return;
             }
         }
-
-        /// <summary>
-        /// Event thrown when comments are recieved.
-        /// </summary>
-        public event EventHandler<WebcastChatMessage> OnCommentRecieved;
-        /// <summary>
-        /// Event thrown when the client connects.
-        /// </summary>
-        public event EventHandler<ConnectionEventArgs> OnConnected;
-        /// <summary>
-        /// Event thrown when the client disconnects.
-        /// </summary>
-        public event EventHandler<ConnectionEventArgs> OnDisconnected;
-        /// <summary>
-        /// Event thrown when a gift is recieved.
-        /// </summary>
-        public event EventHandler<WebcastGiftMessage> OnGiftRecieved;
-        /// <summary>
-        /// Event thrown when groups of likes are recieved.
-        /// Note: OnLike is more likely to be useful here, as OnLikesRecieved is called infrequently.
-        /// </summary>
-        public event EventHandler<WebcastLikeMessage> OnLikesRecieved;
-        /// <summary>
-        /// Event thrown when questions are recieved.
-        /// </summary>
-        public event EventHandler<WebcastQuestionNewMessage> OnQuestionRecieved;
-        /// <summary>
-        /// Event thrown when the view count updates.
-        /// </summary>
-        public event EventHandler<WebcastRoomUserSeqMessage> OnViewerCountUpdated;
-        /// <summary>
-        /// Event thrown when the stream is shared.
-        /// </summary>
-        public event EventHandler<User> OnShare;
-        /// <summary>
-        /// Event thrown when someone follows.
-        /// </summary>
-        public event EventHandler<User> OnFollow;
-        /// <summary>
-        /// Event thrown when someone joins the stream.
-        /// </summary>
-        public event EventHandler<User> OnJoin;
-        /// <summary>
-        /// Event thrown when someone likes the stream.
-        /// </summary>
-        public event EventHandler<User> OnLike;
-        /// <summary>
-        /// Event thrown when an unhandled event is recieved from the webcast.
-        /// It's up to you how you can interpret this message.
-        /// </summary>
-        public event EventHandler<Message> UnhandledEvent;
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TikTokLiveSharp.Events
+﻿namespace TikTokLiveSharp.Events
 {
     public class ConnectionEventArgs
     {
@@ -10,7 +6,7 @@ namespace TikTokLiveSharp.Events
         {
             this.IsConnected = isConnected;
         }
-    
+
         public bool IsConnected { get; }
     }
 }

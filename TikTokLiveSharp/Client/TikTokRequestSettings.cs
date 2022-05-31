@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace TikTokLiveSharp.Client
 {
@@ -9,18 +6,6 @@ namespace TikTokLiveSharp.Client
     {
         public const string TIKTOK_URL_WEB = "https://www.tiktok.com/";
         public const string TIKTOK_URL_WEBCAST = "https://webcast.tiktok.com/webcast/";
-
-        public static readonly IReadOnlyDictionary<string, string> DEFAULT_REQUEST_HEADERS = new Dictionary<string, string>()
-        {
-            { "Connection", "keep-alive" },
-            { "Cache-Control", "max-age=0" },
-            { "Accept", "text/html,application/json,application/protobuf" },
-            { "User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36" },
-            { "Referer", "https://www.tiktok.com/" },
-            { "Origin", "https://www.tiktok.com" },
-            { "Accept-Language", "en-US,en; q=0.9" },
-            { "Accept-Encoding", "gzip, deflate" }
-        };
 
         public static readonly IReadOnlyDictionary<string, object> DEFAULT_CLIENT_PARAMS = new Dictionary<string, object>()
         {
@@ -47,6 +32,18 @@ namespace TikTokLiveSharp.Client
             { "browser_language", "en" },
             { "priority_region", "US" },
             { "region", "US" }
+        };
+
+        public static readonly IReadOnlyDictionary<string, string> DEFAULT_REQUEST_HEADERS = new Dictionary<string, string>()
+        {
+            { "Connection", "keep-alive" },
+            { "Cache-Control", "max-age=0" },
+            { "Accept", "text/html,application/json,application/protobuf" },
+            { "User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36" },
+            { "Referer", "https://www.tiktok.com/" },
+            { "Origin", "https://www.tiktok.com" },
+            { "Accept-Language", "en-US,en; q=0.9" },
+            { "Accept-Encoding", "gzip, deflate" }
         };
     }
 }
