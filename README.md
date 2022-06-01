@@ -8,7 +8,7 @@
 #### Read TikTok Live chat messages, gifts, etc.
 
 A C# port of TikTok Live connector library (See [here](https://github.com/zerodytrash/TikTok-Live-Connector), [here](https://github.com/isaackogan/TikTokLive) and [here](https://github.com/Davincible/gotiktoklive) for more in-depth documentation).
-The primary incentive behind designing this library was to allow direct implementation of the TikTok Live connector into Unity, this means that the library has little to no dependencies and is (almost) entirely native .NET.
+The primary incentive behind designing this library was to allow direct implementation of the TikTok Live connector into Unity, and the library has little to no dependencies and is (almost) entirely native .NET.
 ````c#
 var client = new TikTokLiveClient(uniqueID);
 client.OnCommentRecieved += Client_OnCommentRecieved;
@@ -23,9 +23,7 @@ private static void Client_OnCommentRecieved(object sender, WebcastChatMessage e
 
 ## Setup
 ### Unity
-An implementation of this library called ["TikTokParty"]() is available on the asset store which includes several games.
-
-Or the library itself can be downloaded as a [Unity package]().
+A [Unity package]() can be downloaded from the releases.
 ### Nuget
 The latest release can be found in the Nuget Package Manager or by entering the command:
 
