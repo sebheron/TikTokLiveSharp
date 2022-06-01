@@ -28,3 +28,5 @@ A [Unity package]() can be downloaded from the releases.
 The latest release can be found in the Nuget Package Manager or by entering the command:
 
 `Install-Package TikTokLiveSharp`
+
+Or by navigating to the Nuget [URL](https://www.nuget.org/packages/TikTokLiveSharp/0.1.2).
