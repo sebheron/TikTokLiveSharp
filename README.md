@@ -8,7 +8,7 @@
 #### Read TikTok Live chat messages, gifts, etc.
 
 A C# port of TikTok Live connector library (See [here](https://github.com/zerodytrash/TikTok-Live-Connector), [here](https://github.com/isaackogan/TikTokLive) and [here](https://github.com/Davincible/gotiktoklive) for more in-depth documentation).
-The primary incentive behind designing this library was to allow direct implementation of the TikTok Live connector into Unity, it's implemented in .NET Standard and should work universally along all .NET supported platforms. An older version of Protobuf-net was used to ensure Unity compatibility.
+The primary incentive behind designing this library was to allow direct implementation of the TikTok Live connector into Unity, it's implemented in .NET Standard and should work universally across all .NET supported platforms. An older version of Protobuf-net was used to ensure Unity compatibility.
 ````c#
 var client = new TikTokLiveClient(uniqueID);
 client.OnCommentRecieved += Client_OnCommentRecieved;
