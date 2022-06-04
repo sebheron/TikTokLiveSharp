@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Seb Heron</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/sebheron/tiktoklivesharp</PackageProjectUrl>
@@ -11,6 +11,14 @@
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>TikTok;Live</PackageTags>
     <Description>Port of TikTokLive client for C#</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
