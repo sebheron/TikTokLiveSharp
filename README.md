@@ -1,3 +1,5 @@
+## Critical bug fixed in latest update!
+
 # TikTokLiveSharp
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
 ![Issues](https://img.shields.io/github/issues/sebheron/TikTokLiveSharp)
