@@ -185,7 +185,8 @@ namespace TikTokLiveSharp.Client
             try
             {
                 var response = await this.http.GetJObjectFromWebcastAPI("gift/list/", this.clientParams);
-                var gifts = response.SelectToken("..gifts")?.Children();
+                var gifts = response.SelectTokens("..gifts")?.FirstOrDefault()?.Children() ?? null;
+                if (gifts == null) return new Dictionary<int, JToken>();
                 foreach (var gift in gifts)
                 {
                     this.availableGifts[gift.SelectToken(".id").Value<int>()] = gift;
