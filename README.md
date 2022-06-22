@@ -29,7 +29,7 @@ private static void Client_OnCommentRecieved(object sender, WebcastChatMessage e
 
 ## Setup
 ### Unity
-A [Unity package](https://github.com/sebheron/TikTokLiveSharp/releases/tag/v0.1.2) can be downloaded from the releases.
+A [Unity package](https://github.com/sebheron/TikTokLiveSharp/releases/tag/v0.1.2.1) can be downloaded from the releases.
 ### Nuget
 The latest release can be found in the Nuget Package Manager or by entering the command:
 
