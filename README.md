@@ -1,5 +1,3 @@
-## Critical bug fixed in latest update!
-
 # TikTokLiveSharp
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
 ![Issues](https://img.shields.io/github/issues/sebheron/TikTokLiveSharp)
@@ -30,6 +28,7 @@ private static void Client_OnCommentRecieved(object sender, WebcastChatMessage e
 ## Setup
 ### Unity
 A [Unity package](https://github.com/sebheron/TikTokLiveSharp/releases/tag/v0.1.2.1) can be downloaded from the releases.
+With Unity projects, replace usage of the TikTokLiveClient's Run method with Start to prevent blocking.
 ### Nuget
 The latest release can be found in the Nuget Package Manager or by entering the command:
 
