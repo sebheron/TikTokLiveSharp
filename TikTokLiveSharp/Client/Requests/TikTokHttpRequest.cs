@@ -35,7 +35,8 @@ namespace TikTokLiveSharp.Client.Requests
                 {
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     Proxy = WebProxy,
-                    UseProxy = WebProxy == null ? false : true
+                    UseProxy = WebProxy == null ? false : true,
+                    UseCookies = false
                 };
             }
             if (client == null)
