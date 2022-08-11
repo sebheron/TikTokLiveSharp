@@ -67,7 +67,7 @@ namespace TikTokLiveSharp.Client
             return new TikTokHttpRequest(url)
                 .SetQueries(parameters);
         }
-        internal async Task<string> GetSignedUrl(string url, Dictionary<string, object> parameters = null)
+        private async Task<string> GetSignedUrl(string url, Dictionary<string, object> parameters = null)
         {
             var parsedParameters = parameters != null ? "?" + string.Join("&", parameters.Select(x => $"{x.Key}={x.Value}")) : string.Empty;
             var request = new TikTokHttpRequest(TikTokRequestSettings.TIKTOK_SIGN_API)
@@ -86,8 +86,6 @@ namespace TikTokLiveSharp.Client
                 var userAgent = json.SelectToken("..User-Agent").Value<string>();
                 TikTokHttpRequest.CurrentHeaders.Remove("User-Agent");
                 TikTokHttpRequest.CurrentHeaders.Add("User-Agent", userAgent);
-                var uri = new Uri(TikTokRequestSettings.TIKTOK_URL_WEBCAST);
-                TikTokHttpRequest.CookieJar.Add(new System.Net.Cookie("msToken", msToken) { Domain = uri.Host });
                 return signedUrl;
             }
             catch (Exception e)
