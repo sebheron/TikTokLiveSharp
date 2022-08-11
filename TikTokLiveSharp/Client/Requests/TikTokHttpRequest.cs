@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -11,11 +12,12 @@ namespace TikTokLiveSharp.Client.Requests
     public class TikTokHttpRequest : ITikTokHttpRequest
     {
         private static HttpClient client;
-
         private static HttpClientHandler handler;
+        private static CookieContainer cookieJar;
 
         private static TimeSpan timeout;
         private static IWebProxy webProxy;
+
         private string query;
         private HttpRequestMessage request;
         private bool sent;
@@ -35,7 +37,8 @@ namespace TikTokLiveSharp.Client.Requests
                 {
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     Proxy = WebProxy,
-                    UseProxy = WebProxy == null ? false : true
+                    UseProxy = WebProxy == null ? false : true,
+                    CookieContainer = cookieJar = new CookieContainer()
                 };
             }
             if (client == null)
@@ -84,6 +87,22 @@ namespace TikTokLiveSharp.Client.Requests
         }
 
         /// <summary>
+        /// The cookie jar.
+        /// </summary>
+        public static CookieContainer CookieJar
+        {
+            get => cookieJar;
+        }
+
+        /// <summary>
+        /// The current headers in use.
+        /// </summary>
+        public static HttpRequestHeaders CurrentHeaders
+        {
+            get => client.DefaultRequestHeaders;
+        }
+
+        /// <summary>
         /// Sends an async get request.
         /// </summary>
         /// <returns>HttpContent returned.</returns>
@@ -124,7 +143,7 @@ namespace TikTokLiveSharp.Client.Requests
         /// <summary>
         /// Sends the request and returns the response.
         /// </summary>
-        /// <returns>The content in the response.</returns>
+        /// <returns>The value in the response.</returns>
         /// <exception cref="HttpRequestException">If the request was unsuccessful</exception>
         private async Task<HttpContent> GetContent()
         {
