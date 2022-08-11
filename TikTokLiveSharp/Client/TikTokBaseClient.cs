@@ -60,7 +60,7 @@ namespace TikTokLiveSharp.Client
             this.clientParams["webcast_language"] = lang;
 
             this.http = new TikTokHTTPClient(timeout, proxyHandler);
-            this.pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(1);
+            this.pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(3);
             this.processInitialData = processInitialData;
             this.fetchRoomInfoOnConnect = fetchRoomInfoOnConnect;
             this.enableExtendedGiftInfo = enableExtendedGiftInfo;
@@ -201,7 +201,7 @@ namespace TikTokLiveSharp.Client
 
         protected async Task FetchRoomData(bool isInitial = false)
         {
-            var webcastResponse = await this.http.GetDeserializedMessage("im/fetch/", this.clientParams);
+            var webcastResponse = await this.http.GetDeserializedMessage("im/fetch/", this.clientParams, isInitial);
 
             if (webcastResponse.Cursor != "0")
             {
