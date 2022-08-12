@@ -13,7 +13,7 @@ namespace TikTokLiveSharp.Client.Requests
     {
         private static HttpClient client;
         private static HttpClientHandler handler;
-        private static CookieContainer cookieJar;
+        private static TikTokCookieJar cookieJar;
 
         private static TimeSpan timeout;
         private static IWebProxy webProxy;
@@ -31,6 +31,10 @@ namespace TikTokLiveSharp.Client.Requests
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri result)) throw new ArgumentException();
 
+            if (cookieJar == null)
+            {
+                cookieJar = new TikTokCookieJar();
+            }
             if (handler == null)
             {
                 handler = new HttpClientHandler
@@ -38,7 +42,7 @@ namespace TikTokLiveSharp.Client.Requests
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     Proxy = WebProxy,
                     UseProxy = WebProxy == null ? false : true,
-                    CookieContainer = cookieJar = new CookieContainer()
+                    CookieContainer = new CookieContainer()
                 };
             }
             if (client == null)
@@ -89,7 +93,7 @@ namespace TikTokLiveSharp.Client.Requests
         /// <summary>
         /// The cookie jar.
         /// </summary>
-        public static CookieContainer CookieJar
+        public static TikTokCookieJar CookieJar
         {
             get => cookieJar;
         }
@@ -156,6 +160,15 @@ namespace TikTokLiveSharp.Client.Requests
             var ct = response.Content.Headers?.ContentType;
             if (ct?.CharSet != null)
                 ct.CharSet = ct.CharSet.Replace("\"", "");
+            response.Headers.TryGetValues("Set-Cookie", out var vals);
+            if (vals != null)
+            {
+                foreach (var val in vals)
+                {
+                    var cookie = val.Split(';')[0].Split('=');
+                    cookieJar[cookie[0]] = cookie[1];
+                }
+            }
             return response.Content;
         }
     }
