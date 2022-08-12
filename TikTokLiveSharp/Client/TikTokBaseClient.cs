@@ -222,7 +222,7 @@ namespace TikTokLiveSharp.Client
         {
             this.clientParams[webcastResponse.wsParam.Name] = webcastResponse.wsParam.Value;
             var url = webcastResponse.wsUrl + "?" + string.Join("&", this.clientParams.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value.ToString())}"));
-            this.socket = new TikTokWebSocket(url, TikTokHttpRequest.CookieJar);
+            this.socket = new TikTokWebSocket(TikTokHttpRequest.CookieJar);
             await this.socket.Connect(url);
             this.runningTask = Task.Run(this.WebSocketLoop, token);
             //this.pollingTask = Task.Run(this.WebSocketLoop);
@@ -235,11 +235,7 @@ namespace TikTokLiveSharp.Client
                 try
                 {
                     var response = await this.socket.RecieveMessage();
-                    using (var mem = new MemoryStream())
-                    {
-                        Serializer.Serialize<WebcastWebsocketMessage>(mem, new WebcastWebsocketMessage());
-                        var a = mem.ToArray();
-                    }
+                    if (response == null) continue;
                     using (var memoryStream = new MemoryStream(response))
                     {
                         Serializer.Deserialize<WebcastWebsocketMessage>(memoryStream);
@@ -247,8 +243,7 @@ namespace TikTokLiveSharp.Client
                 }
                 catch (Exception e)
                 {
-
-                Console.WriteLine("suc");
+                    Console.WriteLine("Error receieving message.");
                 }
             }
         }

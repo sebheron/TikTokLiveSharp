@@ -14,7 +14,7 @@ namespace TikTokLiveSharp.Client.Sockets
     {
         private ClientWebSocket clientWebSocket;
 
-        public TikTokWebSocket(string url, TikTokCookieJar cookieContainer)
+        public TikTokWebSocket(TikTokCookieJar cookieContainer)
         {
             this.clientWebSocket = new ClientWebSocket();
             
@@ -41,17 +41,13 @@ namespace TikTokLiveSharp.Client.Sockets
 
         public async Task<byte[]> RecieveMessage()
         {
-            var arr = new ArraySegment<byte>(new byte[8192]);
+            var arr = new ArraySegment<byte>(new byte[8124]);
             var response = await this.clientWebSocket.ReceiveAsync(arr, new CancellationTokenSource(15000).Token);
-            var i = 0;
-            for (int j = 0; j < 8192; j++)
+            if (response.MessageType == WebSocketMessageType.Binary)
             {
-                if (arr.Array[j] != 0)
-                {
-                    i = j;
-                }
+                return arr.Array;
             }
-            return arr.Array.Take(i).ToArray();
+            return null;
         }
 
         public bool IsConnected => this.clientWebSocket.State == WebSocketState.Open;
