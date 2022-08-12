@@ -1,11 +1,16 @@
 ﻿using Newtonsoft.Json.Linq;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using TikTokLiveSharp.Client.Proxy;
+using TikTokLiveSharp.Client.Requests;
+using TikTokLiveSharp.Client.Sockets;
 using TikTokLiveSharp.Errors;
 using TikTokLiveSharp.Protobuf;
 
@@ -15,6 +20,7 @@ namespace TikTokLiveSharp.Client
     {
         protected Dictionary<string, object> clientParams;
         protected TikTokHTTPClient http;
+        protected TikTokWebSocket socket;
         protected bool isPolling, processInitialData, fetchRoomInfoOnConnect, enableExtendedGiftInfo;
         protected TimeSpan pollingInterval;
         private Dictionary<int, JToken> availableGifts;
@@ -22,7 +28,7 @@ namespace TikTokLiveSharp.Client
         private bool connecting;
         private string roomID;
         private JObject roomInfo;
-        private Task runningTask;
+        private Task runningTask, pollingTask;
         private CancellationToken token;
         private string uniqueID;
         private int? viewerCount;
@@ -160,8 +166,6 @@ namespace TikTokLiveSharp.Client
                 token.ThrowIfCancellationRequested();
                 this.connected = true;
 
-                this.runningTask = Task.Run(this.FetchRoomPolling, token);
-
                 return this.roomID;
             }
             catch (Exception e)
@@ -203,14 +207,50 @@ namespace TikTokLiveSharp.Client
         {
             var webcastResponse = await this.http.GetDeserializedMessage("im/fetch/", this.clientParams, isInitial);
 
-            if (webcastResponse.Cursor != "0")
+            this.clientParams["cursor"] = webcastResponse.Cursor;
+            this.clientParams["internal_ext"] = webcastResponse.internalExt;
+
+            if (webcastResponse.wsUrl != null && webcastResponse.wsParam != null)
             {
-                this.clientParams["cursor"] = webcastResponse.Cursor;
+                await this.BeginWebsocket(webcastResponse);
             }
 
-            if (isInitial && !this.processInitialData) return;
-
             this.HandleWebcastMessages(webcastResponse);
+        }
+
+        protected async Task BeginWebsocket(WebcastResponse webcastResponse)
+        {
+            this.clientParams[webcastResponse.wsParam.Name] = webcastResponse.wsParam.Value;
+            var url = webcastResponse.wsUrl + "?" + string.Join("&", this.clientParams.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value.ToString())}"));
+            this.socket = new TikTokWebSocket(url, TikTokHttpRequest.CookieJar);
+            await this.socket.Connect(url);
+            this.runningTask = Task.Run(this.WebSocketLoop, token);
+            //this.pollingTask = Task.Run(this.WebSocketLoop);
+        }
+
+        protected async Task WebSocketLoop()
+        {
+            while (true)
+            {
+                try
+                {
+                    var response = await this.socket.RecieveMessage();
+                    using (var mem = new MemoryStream())
+                    {
+                        Serializer.Serialize<WebcastWebsocketMessage>(mem, new WebcastWebsocketMessage());
+                        var a = mem.ToArray();
+                    }
+                    using (var memoryStream = new MemoryStream(response))
+                    {
+                        Serializer.Deserialize<WebcastWebsocketMessage>(memoryStream);
+                    }
+                }
+                catch (Exception e)
+                {
+
+                Console.WriteLine("suc");
+                }
+            }
         }
 
         protected async Task<string> FetchRoomId()
@@ -246,26 +286,6 @@ namespace TikTokLiveSharp.Client
             catch (Exception e)
             {
                 throw new Exception(e.Message, new FailedFetchRoomInfoException("Failed to fetch room info from WebCast, see stacktrace for more info."));
-            }
-        }
-
-        protected async Task FetchRoomPolling()
-        {
-            this.isPolling = true;
-
-            while (this.isPolling)
-            {
-                try
-                {
-                    await this.FetchRoomData();
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(e.Message, new FailedRoomPollingException("Failed to retrieve events from WebCast, see stacktrace for more info."));
-                }
-
-                await Task.Delay(this.pollingInterval);
-                token.ThrowIfCancellationRequested();
             }
         }
 
