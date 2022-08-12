@@ -1,3 +1,6 @@
+##Currently not working.
+Due to system changes, this current version of TikTokLiveSharp does not work. I'm aiming to get a release out as soon as possible. Any one interested in helping can fork the "Fix-(WIP)" branch and contribute!
+
 # TikTokLiveSharp
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
 ![Issues](https://img.shields.io/github/issues/sebheron/TikTokLiveSharp)
