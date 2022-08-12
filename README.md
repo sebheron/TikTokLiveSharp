@@ -1,4 +1,4 @@
-##Currently not working.
+## Currently not working.
 Due to system changes, this current version of TikTokLiveSharp does not work. I'm aiming to get a release out as soon as possible. Any one interested in helping can fork the "Fix-(WIP)" branch and contribute!
 
 # TikTokLiveSharp
