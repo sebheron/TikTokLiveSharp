@@ -225,26 +225,59 @@ namespace TikTokLiveSharp.Client
             this.socket = new TikTokWebSocket(TikTokHttpRequest.CookieJar);
             await this.socket.Connect(url);
             this.runningTask = Task.Run(this.WebSocketLoop, token);
-            //this.pollingTask = Task.Run(this.WebSocketLoop);
+            this.pollingTask = Task.Run(this.PingLoop, token);
         }
 
         protected async Task WebSocketLoop()
         {
             while (true)
             {
+                var response = await this.socket.RecieveMessage();
+                if (response == null) continue;
                 try
                 {
-                    var response = await this.socket.RecieveMessage();
-                    if (response == null) continue;
-                    using (var memoryStream = new MemoryStream(response))
+                    using (var websocketMessageStream = new MemoryStream(response))
                     {
-                        Serializer.Deserialize<WebcastWebsocketMessage>(memoryStream);
+                        var websocketMessage = Serializer.Deserialize<WebcastWebsocketMessage>(websocketMessageStream);
+
+                        using (var messageStream = new MemoryStream(websocketMessage.Binary))
+                        {
+                            var message = Serializer.Deserialize<WebcastResponse>(messageStream);
+
+                            await this.SendAcknowledgement(websocketMessage.Id);
+
+                            this.HandleWebcastMessages(message);
+                        }
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Error receieving message.");
+                    Console.WriteLine(ex.Message);
                 }
+            }
+        }
+
+        protected async Task PingLoop()
+        {
+            while (true)
+            {
+                using (var messageStream = new MemoryStream())
+                {
+                    await this.socket.WriteMessage(new ArraySegment<byte>(new byte[] { 58, 2, 104, 98 }));
+                }
+                await Task.Delay(10);
+            }
+        }
+
+        protected async Task SendAcknowledgement(ulong id)
+        {
+            using (var messageStream = new MemoryStream()) {
+                Serializer.Serialize<WebcastWebsocketAck>(messageStream, new WebcastWebsocketAck
+                {
+                    Type = "ack",
+                    Id = id
+                });
+                await this.socket.WriteMessage(new ArraySegment<byte>(messageStream.ToArray()));
             }
         }
 

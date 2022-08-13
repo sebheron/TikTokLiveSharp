@@ -41,11 +41,12 @@ namespace TikTokLiveSharp.Client.Sockets
 
         public async Task<byte[]> RecieveMessage()
         {
-            var arr = new ArraySegment<byte>(new byte[8124]);
+            var arr = new ArraySegment<byte>(new byte[100000]);
             var response = await this.clientWebSocket.ReceiveAsync(arr, new CancellationTokenSource(15000).Token);
+            arr.Array.ToList().RemoveAll(x => x == 0);
             if (response.MessageType == WebSocketMessageType.Binary)
             {
-                return arr.Array;
+                return arr.Array.Take(response.Count).ToArray();
             }
             return null;
         }
