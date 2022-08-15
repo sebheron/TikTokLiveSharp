@@ -24,12 +24,27 @@ namespace TikTokLiveSharp.Protobuf
         [global::System.ComponentModel.DefaultValue("")]
         public string Cursor { get; set; } = "";
 
+        [global::ProtoBuf.ProtoMember(3)]
+        public int fetchInterval { get; set; }
+
+        [global::ProtoBuf.ProtoMember(4)]
+        public long serverTimestamp { get; set; }
+
         [global::ProtoBuf.ProtoMember(5)]
         [global::System.ComponentModel.DefaultValue("")]
-        public string ackIds { get; set; } = "";
+        public string internalExt { get; set; } = "";
+
+        [global::ProtoBuf.ProtoMember(6)]
+        public int fetchType { get; set; }
 
         [global::ProtoBuf.ProtoMember(7)]
         public WebsocketParam wsParam { get; set; }
+
+        [global::ProtoBuf.ProtoMember(8)]
+        public int heartbeatDuration { get; set; }
+
+        [global::ProtoBuf.ProtoMember(9)]
+        public bool needAck { get; set; }
 
         [global::ProtoBuf.ProtoMember(10)]
         [global::System.ComponentModel.DefaultValue("")]
@@ -122,6 +137,9 @@ namespace TikTokLiveSharp.Protobuf
 
         [global::ProtoBuf.ProtoMember(1, Name = @"event")]
         public WebcastMessageEvent Event { get; set; }
+
+        [global::ProtoBuf.ProtoMember(10)]
+        public int actionId { get; set; }
 
     }
 
@@ -400,12 +418,12 @@ namespace TikTokLiveSharp.Protobuf
         [global::ProtoBuf.ProtoMember(22)]
         public UserExtraAttributes extraAttributes { get; set; }
 
-        [global::ProtoBuf.ProtoMember(64, Name = @"badge")]
-        public UserBadgesAttributes Badge { get; set; }
-
         [global::ProtoBuf.ProtoMember(38)]
         [global::System.ComponentModel.DefaultValue("")]
         public string uniqueId { get; set; } = "";
+
+        [global::ProtoBuf.ProtoMember(64, Name = @"badges")]
+        public global::System.Collections.Generic.List<UserBadgesAttributes> Badges { get; } = new global::System.Collections.Generic.List<UserBadgesAttributes>();
 
     }
 
@@ -465,6 +483,9 @@ namespace TikTokLiveSharp.Protobuf
 
         [global::ProtoBuf.ProtoMember(21, Name = @"badges")]
         public global::System.Collections.Generic.List<UserBadge> Badges { get; } = new global::System.Collections.Generic.List<UserBadge>();
+
+        [global::ProtoBuf.ProtoMember(20)]
+        public global::System.Collections.Generic.List<UserImageBadge> imageBadges { get; } = new global::System.Collections.Generic.List<UserImageBadge>();
 
     }
 
@@ -622,6 +643,159 @@ namespace TikTokLiveSharp.Protobuf
 
         [global::ProtoBuf.ProtoMember(2, Name = @"data")]
         public RankContainer Data { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class UserImageBadge : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(1)]
+        public int displayType { get; set; }
+
+        [global::ProtoBuf.ProtoMember(2, Name = @"image")]
+        public UserImageBadgeImage Image { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class UserImageBadgeImage : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(1, Name = @"url")]
+        [global::System.ComponentModel.DefaultValue("")]
+        public string Url { get; set; } = "";
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class WebcastEmoteChatMessage : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(2, Name = @"user")]
+        public User User { get; set; }
+
+        [global::ProtoBuf.ProtoMember(3, Name = @"emote")]
+        public EmoteDetails Emote { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class EmoteDetails : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(1)]
+        [global::System.ComponentModel.DefaultValue("")]
+        public string emoteId { get; set; } = "";
+
+        [global::ProtoBuf.ProtoMember(2, Name = @"image")]
+        public EmoteImage Image { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class EmoteImage : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(1)]
+        [global::System.ComponentModel.DefaultValue("")]
+        public string imageUrl { get; set; } = "";
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class WebcastEnvelopeMessage : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(2)]
+        public TreasureBoxData treasureBoxData { get; set; }
+
+        [global::ProtoBuf.ProtoMember(1)]
+        public TreasureBoxUser treasureBoxUser { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class TreasureBoxUser : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(8, Name = @"user2")]
+        public TreasureBoxUser2 User2 { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class TreasureBoxUser2 : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(4, Name = @"user3")]
+        public global::System.Collections.Generic.List<TreasureBoxUser3> User3s { get; } = new global::System.Collections.Generic.List<TreasureBoxUser3>();
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class TreasureBoxUser3 : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(21, Name = @"user4")]
+        public TreasureBoxUser4 User4 { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class TreasureBoxUser4 : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(1, Name = @"user")]
+        public User User { get; set; }
+
+    }
+
+    [global::ProtoBuf.ProtoContract()]
+    public partial class TreasureBoxData : global::ProtoBuf.IExtensible
+    {
+        private global::ProtoBuf.IExtension __pbn__extensionData;
+        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+        [global::ProtoBuf.ProtoMember(5, Name = @"coins")]
+        public uint Coins { get; set; }
+
+        [global::ProtoBuf.ProtoMember(6)]
+        public uint canOpen { get; set; }
+
+        [global::ProtoBuf.ProtoMember(7, Name = @"timestamp")]
+        public ulong Timestamp { get; set; }
 
     }
 

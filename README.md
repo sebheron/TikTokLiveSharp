@@ -1,5 +1,5 @@
-## Currently not working.
-Due to system changes, this current version of TikTokLiveSharp does not work. I'm aiming to get a release out as soon as possible. Any one interested in helping can fork the "Fix-(WIP)" branch and contribute!
+## Package updated
+New events are yet to be implemented, but legacy events are now supported.
 
 # TikTokLiveSharp
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
@@ -30,7 +30,7 @@ private static void Client_OnCommentRecieved(object sender, WebcastChatMessage e
 
 ## Setup
 ### Unity
-A [Unity package](https://github.com/sebheron/TikTokLiveSharp/releases/tag/v0.1.2.1) can be downloaded from the releases.
+A [Unity package](https://github.com/sebheron/TikTokLiveSharp/releases/tag/v0.1.3.1) can be downloaded from the releases.
 With Unity projects, replace usage of the TikTokLiveClient's Run method with Start to prevent blocking.
 ### Nuget
 The latest release can be found in the Nuget Package Manager or by entering the command:
