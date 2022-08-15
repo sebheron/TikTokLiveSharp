@@ -8,20 +8,28 @@ namespace TikTokLiveSharp.Client.Requests
     {
         private IDictionary<string, string> cookies;
 
+        /// <summary>
+        /// Create a TikTok cookie jar instance.
+        /// </summary>
         public TikTokCookieJar()
         {
             this.cookies = new Dictionary<string, string>();
         }
 
-        public string this[string index]
+        /// <summary>
+        /// Get the cookie by key.
+        /// </summary>
+        /// <param name="key">The cookie key.</param>
+        /// <returns>Cookie value.</returns>
+        public string this[string key]
         {
             get
             {
-                return this.cookies[index];
+                return this.cookies[key];
             }
             set
             {
-                this.cookies[index] = value;
+                this.cookies[key] = value;
             }
         }
 

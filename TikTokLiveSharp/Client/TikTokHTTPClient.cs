@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Client.Requests;
 using TikTokLiveSharp.Errors;
@@ -40,7 +38,7 @@ namespace TikTokLiveSharp.Client
 
         internal async Task<string> GetLivestreamPage(string uniqueID, bool signURL = false)
         {
-            var get = await this.GetRequest($"{TikTokRequestSettings.TIKTOK_URL_WEB}@{uniqueID}/live/", signURL:signURL);
+            var get = await this.GetRequest($"{TikTokRequestSettings.TIKTOK_URL_WEB}@{uniqueID}/live/", signURL: signURL);
             return await get.ReadAsStringAsync();
         }
 
