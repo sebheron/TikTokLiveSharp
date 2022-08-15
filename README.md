@@ -1,5 +1,5 @@
-## Currently not working.
-Due to system changes, this current version of TikTokLiveSharp does not work. I'm aiming to get a release out as soon as possible. Any one interested in helping can fork the "Fix-(WIP)" branch and contribute!
+## Package is now working!
+New events are yet to be implemented, but legacy events are now supported.
 
 # TikTokLiveSharp
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
