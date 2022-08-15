@@ -68,7 +68,7 @@ namespace TikTokLiveSharp.Client
 
         public Dictionary<int, JToken> AvailableGifts => this.availableGifts;
 
-        public bool Connected => this.connected;
+        public bool Connected => this.socket?.IsConnected ?? false;
 
         public string RoomID => this.roomID;
 
