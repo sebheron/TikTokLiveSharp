@@ -31,18 +31,18 @@ namespace TikTokLiveSharp.Client.Sockets
 
         public async Task Connect(string url)
         {
-            await this.clientWebSocket.ConnectAsync(new Uri(url), new CancellationTokenSource(15000).Token);
+            await this.clientWebSocket.ConnectAsync(new Uri(url), CancellationToken.None);
         }
 
         public async Task WriteMessage(ArraySegment<byte> arr)
         {
-            await this.clientWebSocket.SendAsync(arr, WebSocketMessageType.Binary, false, new CancellationTokenSource(15000).Token);
+            await this.clientWebSocket.SendAsync(arr, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
 
         public async Task<byte[]> RecieveMessage()
         {
             var arr = new ArraySegment<byte>(new byte[100000]);
-            var response = await this.clientWebSocket.ReceiveAsync(arr, new CancellationTokenSource(15000).Token);
+            var response = await this.clientWebSocket.ReceiveAsync(arr, CancellationToken.None);
             arr.Array.ToList().RemoveAll(x => x == 0);
             if (response.MessageType == WebSocketMessageType.Binary)
             {
