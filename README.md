@@ -1,4 +1,4 @@
-## Package is now working!
+## Package updated
 New events are yet to be implemented, but legacy events are now supported.
 
 # TikTokLiveSharp
