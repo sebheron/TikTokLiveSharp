@@ -37,4 +37,4 @@ The latest release can be found in the Nuget Package Manager or by entering the 
 
 `Install-Package TikTokLiveSharp`
 
-Or by navigating to the Nuget [URL](https://www.nuget.org/packages/TikTokLiveSharp/0.1.2).
+Or by navigating to the Nuget [URL](https://www.nuget.org/packages/TikTokLiveSharp/0.1.3.1).
