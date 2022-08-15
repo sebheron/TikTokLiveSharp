@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -11,11 +12,12 @@ namespace TikTokLiveSharp.Client.Requests
     public class TikTokHttpRequest : ITikTokHttpRequest
     {
         private static HttpClient client;
-
         private static HttpClientHandler handler;
+        private static TikTokCookieJar cookieJar;
 
         private static TimeSpan timeout;
         private static IWebProxy webProxy;
+
         private string query;
         private HttpRequestMessage request;
         private bool sent;
@@ -29,13 +31,18 @@ namespace TikTokLiveSharp.Client.Requests
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri result)) throw new ArgumentException();
 
+            if (cookieJar == null)
+            {
+                cookieJar = new TikTokCookieJar();
+            }
             if (handler == null)
             {
                 handler = new HttpClientHandler
                 {
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     Proxy = WebProxy,
-                    UseProxy = WebProxy == null ? false : true
+                    UseProxy = WebProxy == null ? false : true,
+                    CookieContainer = new CookieContainer()
                 };
             }
             if (client == null)
@@ -84,6 +91,22 @@ namespace TikTokLiveSharp.Client.Requests
         }
 
         /// <summary>
+        /// The cookie jar.
+        /// </summary>
+        public static TikTokCookieJar CookieJar
+        {
+            get => cookieJar;
+        }
+
+        /// <summary>
+        /// The current headers in use.
+        /// </summary>
+        public static HttpRequestHeaders CurrentHeaders
+        {
+            get => client.DefaultRequestHeaders;
+        }
+
+        /// <summary>
         /// Sends an async get request.
         /// </summary>
         /// <returns>HttpContent returned.</returns>
@@ -124,7 +147,7 @@ namespace TikTokLiveSharp.Client.Requests
         /// <summary>
         /// Sends the request and returns the response.
         /// </summary>
-        /// <returns>The content in the response.</returns>
+        /// <returns>The value in the response.</returns>
         /// <exception cref="HttpRequestException">If the request was unsuccessful</exception>
         private async Task<HttpContent> GetContent()
         {
@@ -137,6 +160,15 @@ namespace TikTokLiveSharp.Client.Requests
             var ct = response.Content.Headers?.ContentType;
             if (ct?.CharSet != null)
                 ct.CharSet = ct.CharSet.Replace("\"", "");
+            response.Headers.TryGetValues("Set-Cookie", out var vals);
+            if (vals != null)
+            {
+                foreach (var val in vals)
+                {
+                    var cookie = val.Split(';')[0].Split('=');
+                    cookieJar[cookie[0]] = cookie[1];
+                }
+            }
             return response.Content;
         }
     }
