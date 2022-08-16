@@ -26,8 +26,4 @@
     <PackageReference Include="protobuf-net" Version="2.0.0.668" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Protobuf\" />
-  </ItemGroup>
-
 </Project>
