@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -64,14 +63,13 @@ namespace TikTokLiveSharp.Client.Sockets
         /// Recieves a message from websocket.
         /// </summary>
         /// <returns></returns>
-        public async Task<byte[]> RecieveMessage()
+        public async Task<TikTokWebSocketResponse> RecieveMessage()
         {
             var arr = new ArraySegment<byte>(new byte[100000]);
             var response = await this.clientWebSocket.ReceiveAsync(arr, CancellationToken.None);
-            arr.Array.ToList().RemoveAll(x => x == 0);
             if (response.MessageType == WebSocketMessageType.Binary)
             {
-                return arr.Array.Take(response.Count).ToArray();
+                return new TikTokWebSocketResponse(arr.Array, response.Count);
             }
             return null;
         }
