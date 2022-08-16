@@ -1,10 +1,9 @@
 ## Package updated
 
-[![Join the chat at https://gitter.im/TikTokLiveSharp/community](https://badges.gitter.im/TikTokLiveSharp/community.svg)](https://gitter.im/TikTokLiveSharp/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 New events are yet to be implemented, but legacy events are now supported.
 
 # TikTokLiveSharp
+[![Join the chat at https://gitter.im/TikTokLiveSharp/community](https://badges.gitter.im/TikTokLiveSharp/community.svg)](https://gitter.im/TikTokLiveSharp/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
 ![Issues](https://img.shields.io/github/issues/sebheron/TikTokLiveSharp)
 ![Forks](https://img.shields.io/github/forks/sebheron/TikTokLiveSharp)
@@ -13,8 +12,9 @@ New events are yet to be implemented, but legacy events are now supported.
 
 #### Read TikTok Live chat messages, gifts, etc.
 
-## Showcase
+## Issues
 If you want to showcase a project you've made with this library, create an Issue with the **Showcase** label.
+Other than that issues are purely for bugs, if you're having an implementation issue, please send a message in the [gitter conversation](https://gitter.im/TikTokLiveSharp/community).
 
 ## Details
 A C# port of TikTok Live connector library (See [here](https://github.com/zerodytrash/TikTok-Live-Connector), [here](https://github.com/isaackogan/TikTokLive) and [here](https://github.com/Davincible/gotiktoklive) for more in-depth documentation).
