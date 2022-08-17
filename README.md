@@ -1,8 +1,4 @@
-## Package updated
-
-New events are yet to be implemented, but legacy events are now supported.
-
-# TikTokLiveSharp
+# TikTokLiveSharp v0.1.4
 [![Join the chat at https://gitter.im/TikTokLiveSharp/community](https://badges.gitter.im/TikTokLiveSharp/community.svg)](https://gitter.im/TikTokLiveSharp/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![HitCount](https://hits.dwyl.com/sebheron/TikTokLiveSharp.svg?style=flat)
 ![Issues](https://img.shields.io/github/issues/sebheron/TikTokLiveSharp)
