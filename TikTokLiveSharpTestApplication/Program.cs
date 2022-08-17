@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using TikTokLiveSharp.Client;
-using TikTokLiveSharp.Protobuf;
+using TikTokLiveSharp.Models;
 
 namespace TikTokLiveSharpTestApplication
 {

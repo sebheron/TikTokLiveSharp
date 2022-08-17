@@ -14,7 +14,6 @@ using TikTokLiveSharp.Client.Requests;
 using TikTokLiveSharp.Client.Sockets;
 using TikTokLiveSharp.Errors;
 using TikTokLiveSharp.Models;
-using TikTokLiveSharp.Protobuf;
 
 namespace TikTokLiveSharp.Client
 {

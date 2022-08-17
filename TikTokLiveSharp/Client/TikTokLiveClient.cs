@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Events;
-using TikTokLiveSharp.Protobuf;
+using TikTokLiveSharp.Models;
 
 namespace TikTokLiveSharp.Client
 {

@@ -1,4 +1,4 @@
-﻿using TikTokLiveSharp.Protobuf;
+﻿using TikTokLiveSharp.Models;
 
 namespace TikTokLiveSharp.Events
 {
