@@ -13,7 +13,7 @@ using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Client.Requests;
 using TikTokLiveSharp.Client.Sockets;
 using TikTokLiveSharp.Errors;
-using TikTokLiveSharp.Protobuf;
+using TikTokLiveSharp.Models;
 
 namespace TikTokLiveSharp.Client
 {
@@ -24,7 +24,7 @@ namespace TikTokLiveSharp.Client
         protected TikTokWebSocket socket;
         protected bool connecting, isPolling, processInitialData, fetchRoomInfoOnConnect, enableExtendedGiftInfo;
         protected TimeSpan pollingInterval;
-        private Dictionary<int, JToken> availableGifts;
+        private Dictionary<int, TikTokGift> availableGifts;
         private string roomID;
         private JObject roomInfo;
         private Task runningTask, pollingTask;
@@ -44,7 +44,7 @@ namespace TikTokLiveSharp.Client
         {
             this.uniqueID = uniqueID;
             this.roomInfo = null;
-            this.availableGifts = new Dictionary<int, JToken>();
+            this.availableGifts = new Dictionary<int, TikTokGift>();
             this.roomID = null;
             this.viewerCount = null;
             this.connecting = false;
@@ -70,7 +70,7 @@ namespace TikTokLiveSharp.Client
             this.enableExtendedGiftInfo = enableExtendedGiftInfo;
         }
 
-        public Dictionary<int, JToken> AvailableGifts => this.availableGifts;
+        public Dictionary<int, TikTokGift> AvailableGifts => this.availableGifts;
 
         public bool Connected => this.socket?.IsConnected ?? false;
 
@@ -198,26 +198,27 @@ namespace TikTokLiveSharp.Client
         }
 
         /// <summary>
-        /// Fetch the currently available gifts.
+        /// Fetch the currently available giftTokens.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        protected async Task<Dictionary<int, JToken>> FetchAvailableGifts()
+        protected async Task<Dictionary<int, TikTokGift>> FetchAvailableGifts()
         {
             try
             {
                 var response = await this.http.GetJObjectFromWebcastAPI("gift/list/", this.clientParams);
-                var gifts = response.SelectTokens("..gifts")?.FirstOrDefault()?.Children() ?? null;
-                if (gifts == null) return new Dictionary<int, JToken>();
-                foreach (var gift in gifts)
+                var giftTokens = response.SelectTokens("..gifts")?.FirstOrDefault()?.Children() ?? null;
+                if (giftTokens == null) return new Dictionary<int, TikTokGift>();
+                foreach (var giftToken in giftTokens)
                 {
-                    this.availableGifts[gift.SelectToken(".id").Value<int>()] = gift;
+                    var gift = giftToken.ToObject<TikTokGift>();
+                    this.availableGifts[giftToken.SelectToken(".id").Value<int>()] = gift;
                 }
                 return this.availableGifts;
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message, new FailedFetchGiftsException("Failed to fetch gifts from WebCast, see stacktrace for more info."));
+                throw new Exception(e.Message, new FailedFetchGiftsException("Failed to fetch giftTokens from WebCast, see stacktrace for more info."));
             }
         }
 
@@ -275,7 +276,7 @@ namespace TikTokLiveSharp.Client
                 if (response == null) continue;
                 try
                 {
-                    using (var websocketMessageStream = new MemoryStream(response))
+                    using (var websocketMessageStream = new MemoryStream(response.Array, 0, response.Count))
                     {
                         var websocketMessage = Serializer.Deserialize<WebcastWebsocketMessage>(websocketMessageStream);
 

@@ -27,7 +27,7 @@ namespace TikTokLiveSharp.Client.Sockets
         /// Recieves a message from websocket.
         /// </summary>
         /// <returns></returns>
-        Task<byte[]> RecieveMessage();
+        Task<TikTokWebSocketResponse> RecieveMessage();
 
         /// <summary>
         /// Writes a message to the websocket.

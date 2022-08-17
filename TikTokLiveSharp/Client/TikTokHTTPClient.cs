@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using TikTokLiveSharp.Client.Proxy;
 using TikTokLiveSharp.Client.Requests;
 using TikTokLiveSharp.Errors;
-using TikTokLiveSharp.Protobuf;
+using TikTokLiveSharp.Models;
 
 namespace TikTokLiveSharp.Client
 {
@@ -79,7 +79,6 @@ namespace TikTokLiveSharp.Client
             try
             {
                 var json = JObject.Parse(await content.ReadAsStringAsync());
-                var msToken = json.SelectToken("..signedUrl").Value<string>();
                 var signedUrl = json.SelectToken("..signedUrl").Value<string>();
                 var userAgent = json.SelectToken("..User-Agent").Value<string>();
                 TikTokHttpRequest.CurrentHeaders.Remove("User-Agent");
