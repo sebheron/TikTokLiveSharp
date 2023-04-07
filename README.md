@@ -1,4 +1,4 @@
-### _This version has been discontinued, migrate to the [latest version](https://github.com/frankvHoof93/TikTokLiveSharp) from frankvHoof93
+### _This version has been discontinued, migrate to the [latest version](https://github.com/frankvHoof93/TikTokLiveSharp) from frankvHoof93_
 
 # TikTokLiveSharp v0.1.4
 [![Join the chat at https://gitter.im/TikTokLiveSharp/community](https://badges.gitter.im/TikTokLiveSharp/community.svg)](https://gitter.im/TikTokLiveSharp/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
